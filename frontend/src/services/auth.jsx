@@ -8,14 +8,17 @@ export const register = (username, email, password)=>{
         email, 
         password
         })
+        
 }
 
-export const login = (username, password)=>{
-    return axios.post(`${API_URL}login/`, {
+export const login = async(username, password)=>{
+    const response = await axios.post(`${API_URL}login/`, {
         username,
         password
 
     })
+    localStorage.setItem("respnse : " , response.data.token)
+    return response
 }
 
 export const refreshToken = (refreshToken)=>{
