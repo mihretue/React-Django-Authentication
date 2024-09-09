@@ -1,7 +1,7 @@
 import React from 'react'
 import { Result, Button } from 'antd'
 
-export default function Successl() {
+export default function SuccessLogin() {
   return (
     <Result
     status="success"
