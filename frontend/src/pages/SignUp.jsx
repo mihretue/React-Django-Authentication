@@ -27,7 +27,7 @@ export default function SignUp() {
             const response = await login(logInData.username, logInData.password)
             
             console.log('successfully logged in', response.data)
-            navigate('/successl')
+            history('/successl')
         }catch{
             console.log("Error")
         }
