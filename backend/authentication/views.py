@@ -5,6 +5,8 @@ from rest_framework import status
 from .serializers import UserSerializer
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
 
 class RegisterUser(APIView):
     def post(self, request):
@@ -31,4 +33,27 @@ class RegisterUser(APIView):
             
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class ForgetPassword(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        if email:
+            try:
+                user = User.objects.get(email=email)
+                reset_token = get_random_string(length=32)
+                
+                reset_url = "http://localhost:3000/reset-password?token={reset_token}"
+                send_mail(
+                    'Reset Password',
+                    'Please click on the link to reset your password: ' + reset_url.format(reset_token),
+                    'noreply@auth.com',
+                    [email],
+                    fail_silently=False,
+                )
+                return Response({ "message: password reset message ,"}, status=status.HTTP_200_OK)
+            except  User.DoesNotExist:
+                return Response({'error': 'User with this email does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
 # Create your views here.

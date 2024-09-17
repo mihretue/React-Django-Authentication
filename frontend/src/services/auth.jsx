@@ -26,3 +26,7 @@ export const refreshToken = (refreshToken)=>{
         refresh: refreshToken
     })
 }
+
+export const forgetPassword = (email)=>{
+    return axios.post(`${API_URL}password-reset/`, {email})
+}
