@@ -19,7 +19,7 @@ export default function SignUp() {
     const history = useNavigate()
     const navigate = useNavigate()
     const [logInData, setLogInData] = useState({username: '', password: ''})
-
+    const [errors, setErrors] = useState({})
     const handleLogin= async (e)=>{
         e.preventDefault()
 
@@ -28,7 +28,7 @@ export default function SignUp() {
             
             console.log('successfully logged in', response.data)
             localStorage.setItem('token', response.data.token)
-            history('/successl')
+            history('/home')
         }catch{
             console.log("Error")
         }
@@ -49,14 +49,36 @@ export default function SignUp() {
     const handleLogIn = (e) =>{
         setLogInData({...logInData, [e.target.name]: e.target.value})
     }
+    //form validation
+    const formValidation = ()=>{
+        errors = {}
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if(!formData.username.trim()){
+            errors.username = 'Username is required'
 
+        }
+        if(!formData.email){
+            errors.email ="Email is required"
+        }else if(!/\S+@\S+\.\S+/.test(formData.email)){
+            errors.email = "Email address is invalid"
+        }
+        if(!formData.password){
+            errors.password= "Password is Required"
+        }else if(formData.password.length<6){
+            errors.password = "Password is less in length"
+        }else if(!passwordRegex.test(formData.password)){
+            errors.password= "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character"
+        }
+        if(formData.confirmPassword !==formData.password){
+            errors.confirmPassword = "Passwords do not match"
+        }
+        return errors;
+      }
   const handleSubmit= async (e)=>{
     e.preventDefault()
 
-    if(formData.password !== formData.confirmPassword){
-        setError('Passwords do not match')
-        return;
-    }
+   const formErrors = formValidation();
+   if (Object.keys(formErrors).length > 0) {
     try{
         const response = await register(formData.username, formData.email, formData.password)
         console.log("User Registered",response.data)
@@ -67,8 +89,12 @@ export default function SignUp() {
         } else {
             console.error('Error during registration', err.response);
         }
+    }}else{
+        setErrors(formErrors)
     }
   }
+
+  
     return (
     <div className={`container ${isSignUpMode ? "sign-up-mode" : ""}`}>
         <div className="forms-container">
@@ -95,6 +121,7 @@ export default function SignUp() {
                     onChange={handleLogIn}/>
             </div>
             <input type="submit" value="Login" className="btn solid" />
+            <Link to="/forget-password">forget password?</Link>
             <p className="social-text">Or Sign in with social platforms</p>
             <div className="social-media">
                 <a href="#" className="social-icon">
@@ -119,7 +146,8 @@ export default function SignUp() {
                     name="username" 
                     value={formData.username} 
                     placeholder="Username" 
-                    onChange={handleChange} 
+                    onChange={handleChange}
+                    required 
                 />
             </div>
             <div className="input-field">
@@ -129,6 +157,7 @@ export default function SignUp() {
                     value={formData.email} 
                     placeholder="Email" 
                     onChange={handleChange}
+                    required
                 />
             </div>
             <div className="input-field">
@@ -137,7 +166,8 @@ export default function SignUp() {
                     value={formData.password} 
                     name="password" 
                     placeholder="Password" 
-                    onChange={handleChange} 
+                    onChange={handleChange}
+                    required 
                 />
             </div>
             <div className="input-field">
@@ -147,9 +177,10 @@ export default function SignUp() {
                     value={formData.confirmPassword} 
                     placeholder="ConfirmPassword" 
                     onChange={handleChange} 
+                    required
                 />
             </div>
-            <button type="submit" className="btn" value="Sign up" />
+            <button type="submit" onClick={formValidation} className="btn solid"  >Sign Up</button>
             <p className="social-text">Or Sign up with social platforms</p>
             <div className="social-media">
                 <a href="#" className="social-icon">
